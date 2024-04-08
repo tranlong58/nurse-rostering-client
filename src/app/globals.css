@@ -2,32 +2,24 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
+/* Antd */
+.sidebar .ant-menu-item {
+    border-bottom: 1px solid #B2B7BF;
+    border-radius: 0px !important;
+    width: 100% !important;
+    margin: 0px !important;
+    height: 80px !important;
+    line-height: 80px !important;
+    font-size: 24px;
+    color: black;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
-  }
+.sidebar .ant-menu-item:hover {
+    background-color: #fff !important;
+    color: initial !important;
 }
 
-body {
-  color: rgb(var(--foreground-rgb));
-  background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb));
-}
-
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
+.sidebar .ant-menu-item.ant-menu-item-selected {
+    background-color: #1677FF !important;
+    color: #ffff !important;
 }
