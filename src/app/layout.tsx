@@ -20,7 +20,7 @@ export default function RootLayout({
       <body className="h-screen">
         <Header/>
 
-        <div className="flex h-full">
+        <div className="flex h-fit min-h-full">
           <div className="w-[280px] mt-[60px]">
             <Sidebar/>
           </div>
