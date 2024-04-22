@@ -1,9 +1,9 @@
-export default function SchedulePage() {
+export default function HomePage() {
     return (
         <>
             <div className='p-4 bg-white text-2xl'>
-                Schedule management
+                Home page
             </div>
         </>
-    )
+    );
 }

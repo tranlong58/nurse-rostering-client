@@ -1,4 +1,5 @@
 'use client'
+
 import { Menu } from 'antd'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
@@ -39,7 +40,7 @@ export default function Sidebar() {
     }))
 
     return (
-        <div className='h-full bg-[#F5F6F8]'>
+        <div className='h-full w-[200px] bg-[#F5F6F8]'>
             <Menu
                 theme='dark'
                 mode='inline'

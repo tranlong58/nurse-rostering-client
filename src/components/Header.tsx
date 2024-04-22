@@ -1,13 +1,21 @@
 'use client'
+
 import Link from "next/link";
 import {UserOutlined} from "@ant-design/icons";
 import {useState} from "react";
+import { useRouter } from "next/navigation";
 
-export default function Header() {
+type ChildProps = {
+    user: string
+}
+
+export default function Header({user}: ChildProps) {
+    const router = useRouter()
     const [isShowLogout, setIsShowLogout] = useState(false)
 
-    const logout = () => {
-        setIsShowLogout((prev) => !prev)
+    const handleLogout = () => {
+        localStorage.clear();
+        router.push('/login');
     }
 
     return (
@@ -20,7 +28,7 @@ export default function Header() {
                 <div className='flex justify-center items-center'>
                     <div className='space-x-4 flex'>
                         <div className='!text-white text-xl'>
-                            long.tt194102
+                            {user ? user.split('@')[0] : 'Admin'}
                         </div>
 
                         <div className='relative'>
@@ -33,9 +41,9 @@ export default function Header() {
 
                             {isShowLogout && (
                                 <div
-                                    onClick={() => logout()}
+                                    onClick={handleLogout}
                                     className='absolute bg-[#2f3f4e] top-8 text-white right-0 w-28 text-sm font-bold h-10 p-2 text-center
-                             z-999 cursor-pointer border-[0.5px] border-solid border-slate-50 border-opacity-30'
+                             z-10 cursor-pointer border-[0.5px] border-solid border-slate-50 border-opacity-30'
                                 >
                                     Logout
                                 </div>
