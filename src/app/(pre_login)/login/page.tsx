@@ -3,10 +3,17 @@
 import auth from "@/utils/auth";
 import {Button, Form, Input, notification} from "antd";
 import { useRouter } from 'next/navigation';
+import { useEffect } from "react";
 
 export default function LoginPage() {
     const router = useRouter();
     const [form] = Form.useForm(); 
+
+    useEffect(() => {
+        if(localStorage.getItem('token') !== null) {
+            router.push('/')
+        }
+    }, [router])
 
     const handleLogin = async () => {
         const dataSubmit = form.getFieldsValue()

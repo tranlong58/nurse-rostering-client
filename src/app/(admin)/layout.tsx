@@ -25,10 +25,10 @@ export default function RootLayout({
         <>
             <Header user={user}/>
             <div className="flex h-fit min-h-full">
-                <div className="w-[200px] mt-[60px]">
+                <div className="mt-[50px] w-[180px]">
                     <Sidebar/>
                 </div>
-                <div className="mt-[60px] w-[calc(100%-200px)] bg-[#eff0f4]">
+                <div className="mt-[50px] w-[calc(100%-180px)] bg-[#eff0f4]">
                     {children}
                 </div>
             </div>

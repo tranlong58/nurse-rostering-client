@@ -40,7 +40,7 @@ export default function Sidebar() {
     }))
 
     return (
-        <div className='h-full w-[200px] bg-[#F5F6F8]'>
+        <div className='h-full w-[180px] bg-[#F5F6F8]'>
             <Menu
                 theme='dark'
                 mode='inline'

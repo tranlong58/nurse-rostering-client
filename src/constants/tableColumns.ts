@@ -50,6 +50,21 @@ class TableColumns {
             }
         ]
     }
+
+    static get SCHEDULE_COLUMNS(): Column[] {
+        return [
+            {
+                name: 'date',
+                label: 'Date',
+                width: '20%'
+            },
+            {
+                name: 'detail',
+                label: 'Detail',
+                width: '80%'
+            }
+        ]
+    }
 }
 
 export default TableColumns
