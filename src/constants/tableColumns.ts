@@ -65,6 +65,31 @@ class TableColumns {
             }
         ]
     }
+
+    static get HISTORY_COLUMNS(): Column[] {
+        return [
+            {
+                name: 'id',
+                label: 'ID',
+                width: '20%'
+            },
+            {
+                name: 'start',
+                label: 'Start date',
+                width: '30%'
+            },
+            {
+                name: 'end',
+                label: 'End date',
+                width: '30%'
+            },
+            {
+                name: 'blank',
+                label: 'Action',
+                width: '20%'
+            }
+        ]
+    }
 }
 
 export default TableColumns

@@ -23,3 +23,7 @@
     background-color: #1677FF !important;
     color: #ffff !important;
 }
+
+.schedule-init-form .ant-form-item-label label {
+    font-size: 16px;
+}

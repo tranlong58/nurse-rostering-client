@@ -2,12 +2,9 @@ import axios from 'axios';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-let token = '';
-if (typeof window !== 'undefined') {
-    token = localStorage.getItem('token') ?? '';
-}
-
 const fetchData = async (endpoint: string) => {
+    const token = localStorage.getItem('token') ?? '';
+
     try {
         return await axios.get(`${apiUrl}${endpoint}`, {
             headers: {

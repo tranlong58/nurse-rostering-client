@@ -5,8 +5,14 @@ type KindType = {
   staffId: number;
 };
 
+export type ScheduleType = {
+  id: Date
+  date: Date
+  detail: DetailType[]
+}
+
 export type Schedule = {
-    id: Date
-    date: Date
-    detail: DetailType[]
+  startDate: Date
+  endDate: Date
+  schedules: ScheduleType[]
 }

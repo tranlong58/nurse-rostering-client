@@ -2,12 +2,9 @@ import axios from 'axios';
 
 const apiUrl = process.env.NEXT_PUBLIC_API_URL;
 
-let token = '';
-if (typeof window !== 'undefined') {
-    token = localStorage.getItem('token') ?? '';
-}
-
 const mutate = async (endpoint: string, method: string, values?: any) => {
+    const token = localStorage.getItem('token') ?? '';
+
     try {
         if(method === 'post') {
             return await axios.post(`${apiUrl}${endpoint}`, values, {

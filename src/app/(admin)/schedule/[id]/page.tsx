@@ -2,86 +2,102 @@
 
 import { Shift } from "@/types/shift";
 import { Staff } from "@/types/staff";
+import { Schedule, ScheduleType } from "@/types/schedule";
 import fetchData from "@/utils";
-import { InputNumber, Button, DatePicker, Form, Spin, Table, Select, Modal, notification } from "antd";
+import { Button, Form, Spin, Table, Select, Modal, notification } from "antd";
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import { useEffect, useState } from "react";
 import type { TableColumnsType } from 'antd';
 import Consts from "@/constants";
 import mutate from "@/utils/mutation";
+import { useRouter, useParams } from "next/navigation";
 
-export default function SchedulePage() {
+export default function ScheduleEditPage() {
     dayjs.extend(utc)
+
+    const router = useRouter();
+    const id = useParams().id;
 
     const [dataStaff, setDataStaff] = useState<Staff[]>()
     const [dataShift, setDataShift] = useState<Shift[]>()
-    const [maxDate, setMaxDate] = useState<dayjs.Dayjs>()
+    const [dataSchedule, setDataSchedule] = useState<Schedule>()
 
-    const [isLoadingStaff, setIsLoadingStaff] = useState(true)
-    const [isLoadingShift, setIsLoadingShift] = useState(true)
-    const [isLoadingMaxDate, setIsLoadingMaxDate] = useState(true)
+    const [isLoading, setIsLoading] = useState(true)
 
     const [rangeDate, setRangeDate] = useState<dayjs.Dayjs[]>([])
 
-    const [isShowTable, setIsShowTable] = useState(false)
     const [isModalOpen, setIsModalOpen] = useState(false);
 
     const [totalByStaff, setTotalByStaff] = useState<number[][]>([]);
     const [totalByDate, setTotalByDate] = useState<number[][]>([]);
 
-    const [formInit] = Form.useForm();
     const [formSchedule] = Form.useForm();
 
     useEffect(() => {
-        const getDataStaff = async () => {
-            const fetchedData = await fetchData('/staff/');
-            setDataStaff(fetchedData?.data.data);
+        const getData = async () => {
+            const fetchedDataShift = await fetchData('/shift/');
+            setDataShift(fetchedDataShift?.data.data);
+            
+            const fetchedDataSchedule = await fetchData(`/schedule/${id}`);
+            setDataSchedule(fetchedDataSchedule?.data?.data);
+            
+            const schedules = fetchedDataSchedule?.data?.data?.schedules;
+            const startDate = dayjs(fetchedDataSchedule?.data?.data?.startDate);
+            const endDate = dayjs(fetchedDataSchedule?.data?.data?.endDate);
+            const length = endDate.diff(startDate, 'day') ? endDate.diff(startDate, 'day') + 1 : 0;
 
-            const initTotalByStaff: number[][] = [];
-            fetchedData?.data?.data?.forEach(() => {
-                initTotalByStaff.push([0, 0, 0, 0])
+            const newRangeDate: dayjs.Dayjs[] = [];
+            for (let i = 0; i < length; i++) {
+                const nextDate = startDate.add(i, 'day');
+                newRangeDate.push(nextDate);
+            }
+    
+            setRangeDate(newRangeDate);
+
+            const initTotalByDate: number[][] = newRangeDate?.map((item) => {
+                const res: number[] = []
+                schedules?.forEach((schedule: ScheduleType) => {
+                    if(item.isSame(dayjs(schedule.date))) {
+                        res.push(schedule.detail[0].length)
+                        res.push(schedule.detail[1].length)
+                        res.push(schedule.detail[2].length)
+                        res.push(schedule.detail[3].length)
+                    }
+                })
+
+                return res.length ? res : [0, 0, 0, 0]
+            }) || [];
+
+            setTotalByDate(initTotalByDate);
+
+            const fetchedDataStaff = await fetchData('/staff/');
+            setDataStaff(fetchedDataStaff?.data.data);
+            const staffs = fetchedDataStaff?.data.data;
+
+            const initTotalByStaff: number[][] = staffs?.map(() => [0, 0, 0, 0]) || [];
+            const dataFormSchedule: any = {};
+            
+            schedules?.forEach((schedule: ScheduleType) => {
+                const dateIndex = dayjs(schedule.date).diff(startDate, 'day');
+                schedule.detail.forEach((item, index) => {
+                    item.forEach((staff) => {
+                        const staffIndex = staffs?.findIndex((dataStaff: Staff) => dataStaff.id === staff.staffId);
+                        if (staffIndex !== -1) {
+                            initTotalByStaff[staffIndex][index]++;
+                            dataFormSchedule[`${staff.staffId}-${dateIndex}`] = index;
+                        }
+                    })
+                })
             })
-            setTotalByStaff(initTotalByStaff)
+
+            setTotalByStaff(initTotalByStaff);
+
+            formSchedule.setFieldsValue(dataFormSchedule);
         };
 
-        const getDataShift = async () => {
-            const fetchedData = await fetchData('/shift/');
-            setDataShift(fetchedData?.data.data);
-        };
-
-        const getMaxDate = async () => {
-            const fetchedData = await fetchData('/history/max');
-            setMaxDate(dayjs(fetchedData?.data.data.maxDate));
-        };
-
-        getDataStaff().finally(() => setIsLoadingStaff(false));
-        getDataShift().finally(() => setIsLoadingShift(false));
-        getMaxDate().finally(() => setIsLoadingMaxDate(false));
-    }, []);
-
-    const createSchedule = async () => {
-        const values = await formInit.validateFields();
-        const length = values.length;
-        const startDate = values.startDate;
-        
-        const newRangeDate: dayjs.Dayjs[] = [];
-
-        for (let i = 0; i < length; i++) {
-            const nextDate = startDate.add(i, 'day');
-            newRangeDate.push(nextDate);
-        }
-
-        setRangeDate(newRangeDate);
-        setIsShowTable(true);
-        formSchedule.resetFields();
-
-        const initTotalByStaff: number[][] = dataStaff?.map(() => [0, 0, 0, 0]) || [];
-        setTotalByStaff(initTotalByStaff);
-
-        const initTotalByDate: number[][] = newRangeDate?.map(() => [0, 0, 0, 0]) || [];
-        setTotalByDate(initTotalByDate);
-    }
+        getData().finally(() => setIsLoading(false));
+    }, [formSchedule, id]);
 
     const columns: TableColumnsType = rangeDate.map((item, index) => ({
         title: (
@@ -210,11 +226,13 @@ export default function SchedulePage() {
 
         rangeDate.map((item, index) => {
             const oldValue = formSchedule.getFieldValue(`${staff.id}-${index}`) ?? -1;
+            const isExpired = rangeDate[index].isBefore(dayjs(), 'day');
             result[index] = (
                 <Form.Item name={`${staff.id}-${index}`} initialValue={-1} className="m-0">
                     <Select 
                         options={listShiftOption[item.day() === 0 ? 6 : item.day()-1]}
                         className="min-w-[105px] w-full"
+                        disabled = {isExpired}
                         onChange={(value) => handleChangeSelect(staffIndex, index, value, oldValue)}
                     />
                 </Form.Item>
@@ -280,11 +298,14 @@ export default function SchedulePage() {
     };
 
     const handleOk = async () => {
-        const length = formInit.getFieldValue('length');
-        const startDate = formInit.getFieldValue('startDate');
+        const length = rangeDate.length;
+        const startDate = dayjs(dataSchedule?.startDate);
+
+        console.log('length ', length)
+        console.log('startDate ', startDate)
 
         const dataRaw = formSchedule.getFieldsValue();
-        const dataSchedule: {staffId: number, shiftList: number[]}[] = [];
+        const dataSchedules: {staffId: number, shiftList: number[]}[] = [];
 
         dataStaff?.forEach((staff) => {
             const schedule: {staffId: number, shiftList: number[]} = {
@@ -296,57 +317,33 @@ export default function SchedulePage() {
                 schedule.shiftList.push(dataRaw[`${staff.id}-${i}`])
             }
 
-            dataSchedule.push(schedule)
+            dataSchedules.push(schedule)
         })
 
         const dataSubmit = {
             length,
             startDate: dayjs(startDate).utc().format(),
-            schedule: dataSchedule,
+            schedule: dataSchedules,
         }
         
-        const response = await mutate('/schedule/', 'post', dataSubmit);
+        const response = await mutate(`/schedule/${id}`, 'post', dataSubmit);
 
         if (response.status === 201) {
-            notification.success({message: 'Create schedule successful'});
+            notification.success({message: 'Update schedule successful'});
             setIsModalOpen(false);
-            setIsShowTable(false);
-            setMaxDate(dayjs(startDate).add(length-1, 'day'));
-            formInit.resetFields();
         }        
     }
 
     return (
-        <Spin spinning={isLoadingStaff || isLoadingShift || isLoadingMaxDate}>
+        <Spin spinning={isLoading}>
             <div className='p-2 bg-white text-xl'>
-                Schedule management
+                Schedule update
             </div>
 
-            <div className='p-4'>
-                <Form form={formInit} layout='inline' className="flex justify-around schedule-init-form" size='large'>
-                    <Form.Item label={`Schedule length:`} name="length" rules={[{ required: true, message: 'Please input the length' }]}>
-                        <InputNumber min={7} max={30} className='w-32'/>
-                    </Form.Item>
-                    <Form.Item label={`Date start:`} name="startDate" rules={[{ required: true, message: 'Please input the date start' }]}>
-                        <DatePicker 
-                            className='w-40' 
-                            disabledDate={(current) => {
-                                if(!maxDate) return true
-                                return current && (current < dayjs().startOf('day') || current <= maxDate.startOf('day'))
-                            }}
-                            placeholder=""
-                            format="DD/MM/YYYY"
-                        />
-                    </Form.Item>
-                    <Button type="primary" className='w-32 bg-green-500 hover:!bg-green-400' onClick={createSchedule}>Create</Button>
-                </Form>
-            </div>
-
-            <div className='px-4 h-fit'>
+            <div className='px-4 pt-10 h-fit'>
                 <Form form={formSchedule}>
                     <Table
                         bordered
-                        className={isShowTable ? '' : 'hidden'}
                         scroll={{ x: 'max-content', y: 400}}
                         loading={false}
                         columns={columns}
@@ -354,14 +351,17 @@ export default function SchedulePage() {
                         pagination={false}
                     />
                 </Form>
-                <div className='flex justify-end mt-2 mr-28'>
-                    <Button type="primary" size='large' className={isShowTable ? 'w-32' : 'w-32 hidden'} onClick={showModal}>Save</Button>
+                <div className='p-4 flex justify-around'>
+                    <Button type="primary" size='large' className='w-32 bg-black hover:!bg-slate-600' onClick={() => router.push(`/history/${id}`)}>
+                        Back
+                    </Button>
+                    <Button type="primary" size='large' className='w-32' onClick={showModal}>Save</Button>
                 </div>
             </div>
 
-            <Modal title="Save schedule" className="mt-28" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} >
+            <Modal title="Update schedule" className="mt-28" open={isModalOpen} onOk={handleOk} onCancel={handleCancel} >
                 <div>
-                    Confirm save the new schedule?
+                    Confirm update the schedule?
                 </div>
             </Modal>
         </ Spin>

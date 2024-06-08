@@ -21,12 +21,12 @@ export default function Sidebar() {
             path: '/shift',
         },
         {
-            label: 'Time off',
-            path: '/time-off',
-        },
-        {
             label: 'Schedule',
             path: '/schedule',
+        },
+        {
+            label: 'History',
+            path: '/history',
         },
     ]
 
