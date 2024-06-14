@@ -28,6 +28,10 @@ export default function Sidebar() {
             label: 'History',
             path: '/history',
         },
+        {
+            label: 'Statistic',
+            path: '/statistic',
+        },
     ]
 
     const items = SIDEBAR_MENU.map(({ label, path }) => ({

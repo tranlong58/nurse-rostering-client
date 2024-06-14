@@ -31,7 +31,7 @@ export default function HistoryDetailPage() {
         };
 
         const getDataShift = async () => {
-            const fetchedData = await fetchData('/shift/');
+            const fetchedData = await fetchData('/shift');
             setDataShift(fetchedData?.data.data);
         };
 
@@ -138,7 +138,7 @@ export default function HistoryDetailPage() {
             <div className='px-4 h-fit'>
                 <Table
                     bordered
-                    scroll={{y: 400}}
+                    scroll={{y: 395}}
                     loading={{ spinning: isLoadingSchedule || isLoadingShift }}
                     columns={columns}
                     dataSource={dataSource}

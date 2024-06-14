@@ -35,7 +35,7 @@ export default function SchedulePage() {
 
     useEffect(() => {
         const getDataStaff = async () => {
-            const fetchedData = await fetchData('/staff/');
+            const fetchedData = await fetchData('/staff');
             setDataStaff(fetchedData?.data.data);
 
             const initTotalByStaff: number[][] = [];
@@ -46,7 +46,7 @@ export default function SchedulePage() {
         };
 
         const getDataShift = async () => {
-            const fetchedData = await fetchData('/shift/');
+            const fetchedData = await fetchData('/shift');
             setDataShift(fetchedData?.data.data);
         };
 
@@ -305,7 +305,7 @@ export default function SchedulePage() {
             schedule: dataSchedule,
         }
         
-        const response = await mutate('/schedule/', 'post', dataSubmit);
+        const response = await mutate('/schedule', 'post', dataSubmit);
 
         if (response.status === 201) {
             notification.success({message: 'Create schedule successful'});

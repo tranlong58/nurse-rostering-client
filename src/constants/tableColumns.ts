@@ -90,6 +90,26 @@ class TableColumns {
             }
         ]
     }
+
+    static get STATISTIC_COLUMNS(): Column[] {
+        return [
+            {
+                name: 'staff',
+                label: 'Staff',
+                width: '30%'
+            },
+            {
+                name: 'completed',
+                label: 'Completed',
+                width: '35%'
+            },
+            {
+                name: 'total',
+                label: 'Total',
+                width: '35%'
+            },
+        ]
+    }
 }
 
 export default TableColumns

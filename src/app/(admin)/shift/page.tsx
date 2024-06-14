@@ -39,13 +39,13 @@ export default function ShiftPage() {
             kind: values.kind,
             numberOfStaff: values.numberOfStaff,
         }
-        const response = await mutate('/shift/', 'post', dataSubmit);
+        const response = await mutate('/shift', 'post', dataSubmit);
 
         if (response.status === 201) {
             notification.success({message: 'Add shift successful'});
             setIsModalAddOpen(false);
 
-            const newData = await fetchData('/shift/');
+            const newData = await fetchData('/shift');
             setData(newData?.data.data);
         }
 
@@ -82,7 +82,7 @@ export default function ShiftPage() {
             notification.success({message: 'Edit shift successful'});
             setIsModalEditOpen(false);
 
-            const newData = await fetchData('/shift/');
+            const newData = await fetchData('/shift');
             setData(newData?.data.data);
         }
 
@@ -112,7 +112,7 @@ export default function ShiftPage() {
             notification.success({message: 'Delete shift successful'});
             setIsModalDeleteOpen(false);
 
-            const newData = await fetchData('/shift/');
+            const newData = await fetchData('/shift');
             setData(newData?.data.data);
         }
 
@@ -123,7 +123,7 @@ export default function ShiftPage() {
 
     useEffect(() => {
         const getData = async () => {
-            const fetchedData = await fetchData('/shift/');
+            const fetchedData = await fetchData('/shift');
             setData(fetchedData?.data.data);
         };
 

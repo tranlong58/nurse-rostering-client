@@ -19,7 +19,7 @@ export default function HistoryPage() {
 
     useEffect(() => {
         const getData = async () => {
-            const fetchedData = await fetchData('/history/');
+            const fetchedData = await fetchData('/history');
             setData(fetchedData?.data.data);
         };
 

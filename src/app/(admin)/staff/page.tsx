@@ -37,13 +37,13 @@ export default function StaffPage() {
             id: values.id,
             name: values.name.trim(),
         }
-        const response = await mutate('/staff/', 'post', dataSubmit);
+        const response = await mutate('/staff', 'post', dataSubmit);
 
         if (response.status === 201) {
             notification.success({message: 'Add staff successful'});
             setIsModalAddOpen(false);
 
-            const newData = await fetchData('/staff/');
+            const newData = await fetchData('/staff');
             setData(newData?.data.data);
         }
 
@@ -78,7 +78,7 @@ export default function StaffPage() {
             notification.success({message: 'Edit staff successful'});
             setIsModalEditOpen(false);
 
-            const newData = await fetchData('/staff/');
+            const newData = await fetchData('/staff');
             setData(newData?.data.data);
         }
 
@@ -108,7 +108,7 @@ export default function StaffPage() {
             notification.success({message: 'Delete staff successful'});
             setIsModalDeleteOpen(false);
 
-            const newData = await fetchData('/staff/');
+            const newData = await fetchData('/staff');
             setData(newData?.data.data);
         }
 
@@ -119,7 +119,7 @@ export default function StaffPage() {
 
     useEffect(() => {
         const getData = async () => {
-            const fetchedData = await fetchData('/staff/');
+            const fetchedData = await fetchData('/staff');
             setData(fetchedData?.data.data);
         };
 

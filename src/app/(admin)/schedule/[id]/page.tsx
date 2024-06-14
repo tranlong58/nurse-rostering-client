@@ -36,7 +36,7 @@ export default function ScheduleEditPage() {
 
     useEffect(() => {
         const getData = async () => {
-            const fetchedDataShift = await fetchData('/shift/');
+            const fetchedDataShift = await fetchData('/shift');
             setDataShift(fetchedDataShift?.data.data);
             
             const fetchedDataSchedule = await fetchData(`/schedule/${id}`);
@@ -71,7 +71,7 @@ export default function ScheduleEditPage() {
 
             setTotalByDate(initTotalByDate);
 
-            const fetchedDataStaff = await fetchData('/staff/');
+            const fetchedDataStaff = await fetchData('/staff');
             setDataStaff(fetchedDataStaff?.data.data);
             const staffs = fetchedDataStaff?.data.data;
 
@@ -300,9 +300,6 @@ export default function ScheduleEditPage() {
     const handleOk = async () => {
         const length = rangeDate.length;
         const startDate = dayjs(dataSchedule?.startDate);
-
-        console.log('length ', length)
-        console.log('startDate ', startDate)
 
         const dataRaw = formSchedule.getFieldsValue();
         const dataSchedules: {staffId: number, shiftList: number[]}[] = [];
