@@ -133,17 +133,13 @@ export default function ScheduleEditPage() {
 
     const shiftOption: {value: number, label: string, disabled?: boolean}[] = [
         {value: -1, label: 'None'},
-        {value: 0, label: 'Morning', disabled: true},
-        {value: 1, label: 'Afternoon', disabled: true},
-        {value: 2, label: 'Evening', disabled: true},
-        {value: 3, label: 'Night', disabled: true},
+        {value: 0, label: 'Morning'},
+        {value: 1, label: 'Afternoon'},
+        {value: 2, label: 'Evening'},
+        {value: 3, label: 'Night'},
     ]
 
     const listShiftOption = Array(7).fill('').map(() => shiftOption.map(option => ({ ...option })));
-
-    dataShift?.forEach((item) => {
-        listShiftOption[Consts.DAY[item.day]][Consts.KIND[item.kind]+1].disabled = false;
-    });
 
     const listNumberStaffByDay: number[][] = [[], [], [], [], [], [], []]
 

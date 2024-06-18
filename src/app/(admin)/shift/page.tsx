@@ -11,16 +11,13 @@ import Consts from "@/constants";
 
 export default function ShiftPage() {
     const [data, setData] = useState<Shift[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
-    const [deleteID, setDeleteID] = useState(0);    
+    const [isLoading, setIsLoading] = useState(true);    
 
     const [isModalAddOpen, setIsModalAddOpen] = useState(false);
     const [isModalEditOpen, setIsModalEditOpen] = useState(false);
-    const [isModalDeleteOpen, setIsModalDeleteOpen] = useState(false);
 
     const [formAdd] = Form.useForm();
     const [formEdit] = Form.useForm();
-    const [formDelete] = Form.useForm();
 
     // Add modal
     const showAddModal = () => {
@@ -36,9 +33,9 @@ export default function ShiftPage() {
         const values = await formAdd.validateFields();
         const dataSubmit = {
             day: values.day,
-            kind: values.kind,
-            numberOfStaff: values.numberOfStaff,
+            numberOfStaff: [values.numberOfMorningStaff, values.numberOfAfternoonStaff, values.numberOfEveningStaff, values.numberOfNightStaff],
         }
+        console.log(dataSubmit)
         const response = await mutate('/shift', 'post', dataSubmit);
 
         if (response.status === 201) {
@@ -91,36 +88,6 @@ export default function ShiftPage() {
         }
     };
 
-    // Delete modal
-    const showDeleteModal = (index: number) => {
-        setIsModalDeleteOpen(true);
-        formDelete.setFieldsValue({
-            id: dataSource[index].id,
-        })
-        setDeleteID(dataSource[index].id)
-    };
-
-    const handleDeleteCancel = () => {
-        setIsModalDeleteOpen(false);
-    };
-
-    const handleDeleteOk = async () => {
-        const values = await formDelete.validateFields();
-        const response = await mutate(`/shift/${values.id}`, 'delete');
-
-        if (response.status === 200) {
-            notification.success({message: 'Delete shift successful'});
-            setIsModalDeleteOpen(false);
-
-            const newData = await fetchData('/shift');
-            setData(newData?.data.data);
-        }
-
-        if(response.status === 400) {
-            notification.error({message: response.data.message});
-        }
-    };
-
     useEffect(() => {
         const getData = async () => {
             const fetchedData = await fetchData('/shift');
@@ -139,7 +106,6 @@ export default function ShiftPage() {
         blank: (
             <div className='flex items-center justify-center gap-x-10'>
                 <Button type="primary" size='large' className='w-20' onClick={() => showEditModal(index)}>Edit</Button>
-                <Button type="primary" size='large' className='w-20 bg-red-500 hover:!bg-red-400' onClick={() => showDeleteModal(index)}>Delete</Button>
             </div>
         )
     })) : []
@@ -183,39 +149,43 @@ export default function ShiftPage() {
                         <Select options={Consts.DAY_OPTIONS}/>
                     </Form.Item>
 
-                    <Form.Item label="Kind" name="kind" rules={[{ required: true, message: 'Please input the kind' }]}>
-                        <Select options={Consts.KIND_OPTIONS}/>
-                    </Form.Item>
+                    <div>
+                        Number of staff
+                    </div>
+                    <div className="flex gap-5">
+                        <Form.Item label="Morning" name="numberOfMorningStaff" rules={[{ required: true, message: 'Please input the number of staff' }]}>
+                            <InputNumber size='large' min={0} className='w-full'/>
+                        </Form.Item>
+                        <Form.Item label="Afternoon" name="numberOfAfternoonStaff" rules={[{ required: true, message: 'Please input the number of staff' }]}>
+                            <InputNumber size='large' min={0} className='w-full'/>
+                        </Form.Item>
 
-                    <Form.Item label="Number of staff" name="numberOfStaff" rules={[{ required: true, message: 'Please input the number of staff' }]}>
-                        <InputNumber size='large' min={1} className='w-full'/>
-                    </Form.Item>
+                        <Form.Item label="Evening" name="numberOfEveningStaff" rules={[{ required: true, message: 'Please input the number of staff' }]}>
+                            <InputNumber size='large' min={0} className='w-full'/>
+                        </Form.Item>
+
+                        <Form.Item label="Night" name="numberOfNightStaff" rules={[{ required: true, message: 'Please input the number of staff' }]}>
+                            <InputNumber size='large' min={0} className='w-full'/>
+                        </Form.Item>
+                    </div>
+
                 </Form>
             </Modal>
 
             <Modal title="Edit Shift" open={isModalEditOpen} onOk={handleEditOk} onCancel={handleEditCancel} >
                 <Form form={formEdit} layout="vertical">
                     <Form.Item label="Day" name="day" rules={[{ required: true, message: 'Please input the day' }]}>
-                        <Select options={Consts.DAY_OPTIONS}/>
+                        <Select disabled options={Consts.DAY_OPTIONS} suffixIcon={null}/>
                     </Form.Item>
 
                     <Form.Item label="Kind" name="kind" rules={[{ required: true, message: 'Please input the kind' }]}>
-                        <Select options={Consts.KIND_OPTIONS}/>
+                        <Select disabled options={Consts.KIND_OPTIONS} suffixIcon={null}/>
                     </Form.Item>
 
                     <Form.Item label="Number of staff" name="numberOfStaff" rules={[{ required: true, message: 'Please input the number of staff' }]}>
-                        <InputNumber size='large' min={1} className='w-full'/>
+                        <InputNumber size='large' min={0} className='w-full'/>
                     </Form.Item>
 
-                    <Form.Item name="id" hidden>
-                        <Input/>
-                    </Form.Item>
-                </Form>
-            </Modal>
-
-            <Modal title="Delete Shift" open={isModalDeleteOpen} onOk={handleDeleteOk} onCancel={handleDeleteCancel} >
-                <Form form={formDelete} layout="vertical">
-                    <div>Confirm delete shift with ID <strong>{deleteID}</strong> ?</div>
                     <Form.Item name="id" hidden>
                         <Input/>
                     </Form.Item>
