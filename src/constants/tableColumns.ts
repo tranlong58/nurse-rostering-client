@@ -66,6 +66,26 @@ class TableColumns {
         ]
     }
 
+    static get SCHEDULE_TODAY_COLUMNS(): Column[] {
+        return [
+            {
+                name: 'kind',
+                label: 'Kind',
+                width: '20%'
+            },
+            {
+                name: 'staff',
+                label: 'Staff',
+                width: '60%'
+            },
+            {
+                name: 'total',
+                label: 'Total',
+                width: '20%'
+            },
+        ]
+    }
+
     static get HISTORY_COLUMNS(): Column[] {
         return [
             {

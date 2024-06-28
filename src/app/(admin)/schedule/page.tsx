@@ -323,7 +323,7 @@ export default function SchedulePage() {
                     <Form.Item label={`Schedule length:`} name="length" rules={[{ required: true, message: 'Please input the length' }]}>
                         <InputNumber min={7} max={30} className='w-32'/>
                     </Form.Item>
-                    <Form.Item label={`Date start:`} name="startDate" rules={[{ required: true, message: 'Please input the date start' }]}>
+                    <Form.Item label={`Start date:`} name="startDate" rules={[{ required: true, message: 'Please input the date start' }]}>
                         <DatePicker 
                             className='w-40' 
                             disabledDate={(current) => {

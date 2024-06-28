@@ -16,3 +16,9 @@ export type Schedule = {
   endDate: Date
   schedules: ScheduleType[]
 }
+
+export type ScheduleToday = {
+  detail: DetailType[]
+  listMaxStaff: number[]
+  id: number[]
+}
