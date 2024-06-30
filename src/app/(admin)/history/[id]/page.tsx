@@ -150,7 +150,7 @@ export default function HistoryDetailPage() {
                 <Button type="primary" size='large' className='w-32 bg-black hover:!bg-slate-600' onClick={() => router.push('/history')}>
                     Back
                 </Button>
-                <Button type="primary" size='large' className='w-32' onClick={() => router.push(`/schedule/${id}`)}>
+                <Button type="primary" size='large' className='w-32' disabled={dayjs(dataSchedule?.endDate) < dayjs().startOf('day')} onClick={() => router.push(`/schedule/${id}`)}>
                     Edit
                 </Button>
             </div>
