@@ -282,6 +282,8 @@ export default function SchedulePage() {
         const dataRaw = formSchedule.getFieldsValue();
         const dataSchedule: {staffId: number, shiftList: number[]}[] = [];
 
+        let total = 0;
+
         dataStaff?.forEach((staff) => {
             const schedule: {staffId: number, shiftList: number[]} = {
                 staffId: staff.id,
@@ -289,7 +291,11 @@ export default function SchedulePage() {
             }
 
             for(let i=0; i<length; i++) {
-                schedule.shiftList.push(dataRaw[`${staff.id}-${i}`])
+                schedule.shiftList.push(dataRaw[`${staff.id}-${i}`]);
+
+                if(dataRaw[`${staff.id}-${i}`] !== -1) {
+                    total++;
+                }
             }
 
             dataSchedule.push(schedule)
@@ -300,16 +306,21 @@ export default function SchedulePage() {
             startDate: dayjs(startDate).utc().format(),
             schedule: dataSchedule,
         }
-        
-        const response = await mutate('/schedule', 'post', dataSubmit);
 
-        if (response.status === 201) {
-            notification.success({message: 'Create schedule successful'});
-            setIsModalOpen(false);
-            setIsShowTable(false);
-            setMaxDate(dayjs(startDate).add(length-1, 'day'));
-            formInit.resetFields();
-        }        
+        if(total > 0) {
+            const response = await mutate('/schedule', 'post', dataSubmit);
+            
+            if (response.status === 201) {
+                notification.success({message: 'Create schedule successful'});
+                setIsModalOpen(false);
+                setIsShowTable(false);
+                setMaxDate(dayjs(startDate).add(length-1, 'day'));
+                formInit.resetFields();
+            } 
+        }
+        else {
+            notification.error({message: 'Schedule cannot be empty'});
+        }       
     }
 
     return (

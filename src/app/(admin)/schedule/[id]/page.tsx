@@ -300,6 +300,8 @@ export default function ScheduleEditPage() {
         const dataRaw = formSchedule.getFieldsValue();
         const dataSchedules: {staffId: number, shiftList: number[]}[] = [];
 
+        let total = 0;
+
         dataStaff?.forEach((staff) => {
             const schedule: {staffId: number, shiftList: number[]} = {
                 staffId: staff.id,
@@ -307,7 +309,11 @@ export default function ScheduleEditPage() {
             }
 
             for(let i=0; i<length; i++) {
-                schedule.shiftList.push(dataRaw[`${staff.id}-${i}`])
+                schedule.shiftList.push(dataRaw[`${staff.id}-${i}`]);
+
+                if(dataRaw[`${staff.id}-${i}`] !== -1) {
+                    total++;
+                }
             }
 
             dataSchedules.push(schedule)
@@ -318,13 +324,18 @@ export default function ScheduleEditPage() {
             startDate: dayjs(startDate).utc().format(),
             schedule: dataSchedules,
         }
-        
-        const response = await mutate(`/schedule/${id}`, 'post', dataSubmit);
 
-        if (response.status === 201) {
-            notification.success({message: 'Update schedule successful'});
-            setIsModalOpen(false);
-        }        
+        if(total > 0) {
+            const response = await mutate(`/schedule/${id}`, 'post', dataSubmit);
+    
+            if (response.status === 201) {
+                notification.success({message: 'Update schedule successful'});
+                setIsModalOpen(false);
+            } 
+        }
+        else {
+            notification.error({message: 'Schedule cannot be empty'});
+        }
     }
 
     return (
