@@ -24,6 +24,7 @@ export default function ScheduleEditPage() {
     const [dataSchedule, setDataSchedule] = useState<Schedule>()
 
     const [isLoading, setIsLoading] = useState(true)
+    const [isExecute, setIsExecute] = useState(false)
 
     const [rangeDate, setRangeDate] = useState<dayjs.Dayjs[]>([])
 
@@ -326,20 +327,50 @@ export default function ScheduleEditPage() {
         }
 
         if(total > 0) {
-            const response = await mutate(`/schedule/${id}`, 'post', dataSubmit);
-    
-            if (response.status === 201) {
-                notification.success({message: 'Update schedule successful'});
+            //Check total staff per shift
+            const indexStartDate = dayjs(startDate).day() === 0 ? 6 : dayjs(startDate).day()-1;
+            let isExceed = false;
+            let errorDate = '';
+
+            for(let i=0; i<length; i++) {
+                const result = [0, 0, 0, 0];
+                for(let j=0; j<dataSchedules.length; j++) {
+                    const kind = dataSchedules[j].shiftList[i];
+                    if(kind !== -1) result[kind]++;
+                }
+                for(let j=0; j<4; j++) {
+                    const index = (i+indexStartDate)%7;
+                    if(listNumberStaffByDay[index][j] < result[j]) isExceed = true;
+                }
+                if(isExceed) {
+                    errorDate = dayjs(rangeDate[i]).format('DD/MM');
+                    break;
+                } 
+            }
+
+            if(!isExceed) {
                 setIsModalOpen(false);
-            } 
+                setIsExecute(true);
+                const response = await mutate(`/schedule/${id}`, 'post', dataSubmit);
+                setIsExecute(false);
+
+                if (response.status === 201) {
+                    notification.success({message: 'Update schedule successful'});
+                } 
+            }
+            else {
+                setIsModalOpen(false);
+                notification.error({message: `Staffs exceed the limit on ${errorDate}`});
+            }
         }
         else {
+            setIsModalOpen(false);
             notification.error({message: 'Schedule cannot be empty'});
         }
     }
 
     return (
-        <Spin spinning={isLoading}>
+        <Spin spinning={isLoading || isExecute}>
             <div className='p-2 bg-white text-xl'>
                 Schedule update
             </div>

@@ -35,7 +35,6 @@ export default function ShiftPage() {
             day: values.day,
             numberOfStaff: [values.numberOfMorningStaff, values.numberOfAfternoonStaff, values.numberOfEveningStaff, values.numberOfNightStaff],
         }
-        console.log(dataSubmit)
         const response = await mutate('/shift', 'post', dataSubmit);
 
         if (response.status === 201) {

@@ -21,6 +21,7 @@ export default function SchedulePage() {
     const [isLoadingStaff, setIsLoadingStaff] = useState(true)
     const [isLoadingShift, setIsLoadingShift] = useState(true)
     const [isLoadingMaxDate, setIsLoadingMaxDate] = useState(true)
+    const [isExecute, setIsExecute] = useState(false)
 
     const [rangeDate, setRangeDate] = useState<dayjs.Dayjs[]>([])
 
@@ -308,23 +309,53 @@ export default function SchedulePage() {
         }
 
         if(total > 0) {
-            const response = await mutate('/schedule', 'post', dataSubmit);
-            
-            if (response.status === 201) {
-                notification.success({message: 'Create schedule successful'});
+            //Check total staff per shift
+            const indexStartDate = dayjs(startDate).day() === 0 ? 6 : dayjs(startDate).day()-1;
+            let isExceed = false;
+            let errorDate = '';
+
+            for(let i=0; i<length; i++) {
+                const result = [0, 0, 0, 0];
+                for(let j=0; j<dataSchedule.length; j++) {
+                    const kind = dataSchedule[j].shiftList[i];
+                    if(kind !== -1) result[kind]++;
+                }
+                for(let j=0; j<4; j++) {
+                    const index = (i+indexStartDate)%7;
+                    if(listNumberStaffByDay[index][j] < result[j]) isExceed = true;
+                }
+                if(isExceed) {
+                    errorDate = dayjs(rangeDate[i]).format('DD/MM');
+                    break;
+                } 
+            }
+
+            if(!isExceed) {
                 setIsModalOpen(false);
-                setIsShowTable(false);
-                setMaxDate(dayjs(startDate).add(length-1, 'day'));
-                formInit.resetFields();
-            } 
+                setIsExecute(true);
+                const response = await mutate('/schedule', 'post', dataSubmit);
+                setIsExecute(false);
+                
+                if (response.status === 201) {
+                    notification.success({message: 'Create schedule successful'});
+                    setIsShowTable(false);
+                    setMaxDate(dayjs(startDate).add(length-1, 'day'));
+                    formInit.resetFields();
+                } 
+            }
+            else {
+                setIsModalOpen(false);
+                notification.error({message: `Staffs exceed the limit on ${errorDate}`});
+            }
         }
         else {
+            setIsModalOpen(false);
             notification.error({message: 'Schedule cannot be empty'});
         }       
     }
 
     return (
-        <Spin spinning={isLoadingStaff || isLoadingShift || isLoadingMaxDate}>
+        <Spin spinning={isLoadingStaff || isLoadingShift || isLoadingMaxDate || isExecute}>
             <div className='p-2 bg-white text-xl'>
                 Schedule management
             </div>
